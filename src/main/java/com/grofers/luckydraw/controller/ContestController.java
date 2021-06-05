@@ -3,7 +3,6 @@ package com.grofers.luckydraw.controller;
 import com.grofers.luckydraw.common.Util;
 import com.grofers.luckydraw.model.*;
 import com.grofers.luckydraw.repo.*;
-import org.apache.tomcat.util.http.parser.HttpParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
+
 
 import static com.grofers.luckydraw.common.Util.randomString;
 
@@ -33,12 +32,12 @@ public class ContestController {
     ContestRepo contestRepo;
     @Autowired
     GiftRepo giftRepo;
-
+    private Random rand = new Random();
     @PostMapping("/createContest")
     @Transactional
     public ResponseEntity<Contest> createContest(@RequestParam String date, @RequestParam List<Integer> gifts) throws ParseException {
         List<Gift> giftsFromDb = giftRepo.findAllById(gifts);
-        Contest contest = new Contest(getDate(date), giftsFromDb);
+        Contest contest = new Contest(Util.getDate(date), giftsFromDb);
         contest = contestRepo.save(contest);
         return new ResponseEntity<>(contest, HttpStatus.OK);
     }
@@ -86,9 +85,9 @@ public class ContestController {
     public ResponseEntity<List<Winner>> computeWinner(@RequestParam Integer cid) {
         Contest contest = contestRepo.findById(cid).get();
         List<Winner> winners = contest.getWinners();
-        if (winners == null || winners.isEmpty()) {
+        if (winners.isEmpty()) {
             List<Raffle> raffles = raffleRepo.getByContest(cid);
-            Random rand = new Random();
+
             Raffle raffle = raffles.get(rand.nextInt(raffles.size()));
             User user = userRepo.findByRaffleId(raffle.getId());
             Winner winner = new Winner(user, 1, contest.getGifts().get(0));
@@ -119,12 +118,6 @@ public class ContestController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(contest, HttpStatus.OK);
 
-    }
-
-    private LocalDateTime getDate(String date) throws ParseException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
-        return dateTime;
     }
 
 }

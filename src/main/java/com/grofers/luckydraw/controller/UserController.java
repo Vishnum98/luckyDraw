@@ -19,7 +19,7 @@ public class UserController {
     private UserRepo userRepo;
 
     @PostMapping("/createUser")
-    private ResponseEntity<User> createUser(@RequestParam String name, @RequestParam String add) {
+    public ResponseEntity<User> createUser(@RequestParam String name, @RequestParam String add) {
 
         User user = new User(name, add);
 
@@ -28,8 +28,14 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    /**
+     *  Get's all users Based on ID & NAME
+     * @param id userID
+     * @param name user Name
+     * @return List of Users satisfying the conditions
+     */
     @GetMapping("/get")
-    private ResponseEntity<List<User>> getAllUser(@RequestParam(required = false) Integer id,@RequestParam(required = false) String name) {
+    public ResponseEntity<List<User>> getAllUser(@RequestParam(required = false) Integer id,@RequestParam(required = false) String name) {
 
         List<User> users = new ArrayList<>();
         if(id != null && name != null) {

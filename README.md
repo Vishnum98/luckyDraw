@@ -1,6 +1,9 @@
 # Lucky Draw
 Lucky Draw API app 
 
+Technologies used:
+Maven, SprinBoot, Postgres, Hibernate/JPA for DB Queries/ORM 
+
 ## API's supported :
 
 General nomenclature for param's in api's:
